@@ -1,10 +1,12 @@
+#!/usr/bin/python2.7
 """prog.
 
 Usage:
-    prog.py open <name>
-    prog.py ls
-    prog.py add <name> <directory>
-    prog.py rm <name>
+    prog open <name>
+    prog ls
+    prog add
+    prog add <name> <directory>
+    prog rm <name>
 """
 
 import os
@@ -16,14 +18,13 @@ class BashCommand:
     command = ''
 
     def execute(self):
-        print self.command
-        #TODO
+        os.system(self.command)
 
-    def add_change_dir(self, dir):
-        self.command += 'cd ' + dir + ';'
+    def add_change_dir(self, directory):
+        self.command += 'cd ' + directory + ';'
 
     def add_vim_session(self):
-        self.command += 'test -e Sessions.vim && vim -S || vim;'
+        self.command += 'test -e Session.vim && vim -S || vim;'
 
     def get_expanded_dir(self, directory):
         if directory:
@@ -74,7 +75,7 @@ class ProjectList:
         pickle.dump(self.project_list, f)
         f.close()
 
-    def prog_add(self, name, directory=None):
+    def prog_add(self, name=None, directory=None):
         """Add a project"""
         if name in map(lambda p : p['name'], self.project_list):
             print "Project already exists"
@@ -82,6 +83,9 @@ class ProjectList:
 
         command = BashCommand()
         directory = command.get_expanded_dir(directory)
+
+        if not name:
+            name = os.path.basename(directory)
 
         self.project_list.append({'name': name, 'dir': directory})
         
@@ -102,20 +106,3 @@ if __name__ == '__main__':
         project_list.prog_add(arguments['<name>'], arguments['<directory>'])
     elif arguments['open']:
         project_list.prog_open(arguments['<name>'])
-    
-    #project_list = ProjectList()
-
-    #print 'Add test1, test2 and test3'
-    #project_list.prog_add('test1','testdir')
-    #project_list.prog_add('test2','/home/lewis')
-    #project_list.prog_add('test3','../../bin')
-    #print 'ls'
-    #project_list.prog_ls()
-
-    #print '\n'
-    #print 'Remove test1'
-    #project_list.prog_rm('test1')
-    #print 'ls'
-    #project_list.prog_ls()
-    #print 'Open test2'
-    #project_list.prog_open('test2')
