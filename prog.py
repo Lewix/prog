@@ -38,7 +38,7 @@ class BashCommand:
 
 
 class ProjectList:
-    def __init__(self, project_file='/home/lewis/.projs'):
+    def __init__(self, project_file='$HOME/.projs'):
         self.project_file = project_file
         f = open(project_file, 'r')
         try:
