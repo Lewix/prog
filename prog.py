@@ -39,8 +39,8 @@ class BashCommand:
 
 class ProjectList:
     def __init__(self, project_file='~/.projs'):
-        self.project_file = project_file
-        f = open(os.path.expanduser(project_file), 'r')
+        self.project_file = os.path.expanduser(project_file)
+        f = open(self.project_file, 'r')
         try:
             self.project_list = pickle.load(f)
         except EOFError:
