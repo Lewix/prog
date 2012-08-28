@@ -2,7 +2,7 @@
 """prog.
 
 Usage:
-    prog open [<name>]
+    prog open [-s] [<name>]
     prog ls
     prog default [<name>]
     prog add [-d]
@@ -27,8 +27,15 @@ class BashCommand:
     def add_change_dir(self, directory):
         self.command += 'cd ' + directory + ';'
 
-    def add_vim_session(self):
-        self.command += 'test -e Session.vim && vim -S || vim;'
+    def add_vim_session(self, open_shell):
+        if open_shell:
+            vim_command = 'vim -c :sh'
+        else:
+            vim_command = 'vim'
+        self.command += 'test -e Session.vim && {0} -S || {0};'.format(vim_command)
+
+    def open_shell(self):
+        self.command += 'bash;'
 
     def get_expanded_dir(self, directory=None):
         if directory:
@@ -69,15 +76,15 @@ class ProjectList:
         else:
             print 'No such project'
 
-    def prog_default(self):
+    def prog_default(self, open_shell):
         """Open the default project"""
         try:
             project_name = [p['name'] for p in self.project_list if p['default']][0]
-            self.prog_open(project_name)
+            self.prog_open(project_name, open_shell)
         except IndexError:
             'No default project'
 
-    def prog_open(self, name):
+    def prog_open(self, name, open_shell):
         """Change directory to the given project and open vim"""
         command = BashCommand()
 
@@ -85,7 +92,7 @@ class ProjectList:
         try:
             project_dir = [p['dir'] for p in self.project_list if p['name'] == name][0]
             command.add_change_dir(project_dir)
-            command.add_vim_session()
+            command.add_vim_session(open_shell)
             command.execute()
         except IndexError:
             print 'No such project'
@@ -146,6 +153,6 @@ if __name__ == '__main__':
     elif arguments['add']:
         project_list.prog_add(arguments['<name>'], arguments['<directory>'], arguments['-d'])
     elif arguments['open'] and arguments['<name>']:
-        project_list.prog_open(arguments['<name>'])
+        project_list.prog_open(arguments['<name>'], arguments['-s'])
     elif arguments['open']:
-        project_list.prog_default()
+        project_list.prog_default(arguments['-s'])
